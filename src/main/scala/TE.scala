@@ -2,12 +2,6 @@ import TE.{AndTE, OrTE}
 
 import java.time.{DayOfWeek, LocalDateTime, LocalTime}
 
-//case class Time(hour: Int, minute: Int) {
-//  override def toString: String = s"${Time.zeroPad(hour)}:${Time.zeroPad(minute)}"
-//}
-//object Time:
-//  private def zeroPad(n: Int): String = if n <= 9 then s"0$n" else n.toString
-//
 enum TE:
   case DayOfWeekTE(day: DayOfWeek) extends TE
   case DateTE(date: LocalDateTime) extends TE
@@ -31,8 +25,8 @@ extension (self: TE)
       timeOfDay >= from.toSecondOfDay && timeOfDay <= to.toSecondOfDay
 
   def print: String = self match
-    case TE.DayOfWeekTE(day) => day.name
-    case TE.DateTE(date) => date.toString
+    case TE.DayOfWeekTE(day) => s"DayOfWeek(${day.name})"
+    case TE.DateTE(date) => s"Date(${date.toString})"
     case TE.AndTE(self, that) => s"And(${self.print}, ${that.print})"
     case TE.OrTE(self, that) => s"Or(${self.print}, ${that.print})"
     case TE.BetweenDatesTE(from, to) => s"BetweenDates(${from.toString}, ${to.toString})"
