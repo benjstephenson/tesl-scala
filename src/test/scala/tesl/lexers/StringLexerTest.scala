@@ -1,14 +1,15 @@
-package lexers
+package tesl.lexers
 
 import org.scalatest.Inside
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
 import org.scalatest.prop.TableDrivenPropertyChecks
+import tesl.lexers.StringLexer
 
 import java.time.DayOfWeek
 
 class StringLexerTest extends AnyFlatSpec with Inside with Matchers with TableDrivenPropertyChecks {
-  import Token._
+  import tesl.lexers.Token._
 
   "BetweenDates" must "tokenise" in {
     val DateStrings = Table(
@@ -90,25 +91,37 @@ class StringLexerTest extends AnyFlatSpec with Inside with Matchers with TableDr
     }
   }
 
+  "Not expressions" must "tokenise" in {
+    val expr = "Not(DayOfWeek(Tue))"
+
+    inside(StringLexer(expr)) {
+      case Right(token) => token mustBe NotToken(DayOfWeekToken("Tue"))
+    }
+  }
+
 
   "Nested expressions" must "tokenise" in {
     val expr = """
-      And(
-           Or(
-              BetweenDates(2024-01-01T12:00:00, 2024-01-02T12:00:00),
-              BetweenDates(2024-01-02T12:00:00, 2024-01-03T12:00:00)
-           ),
-           Or(DayOfWeek(Tue), DayOfWeek(Thu))
+      Not(
+        And(
+             Or(
+                BetweenDates(2024-01-01T12:00:00, 2024-01-02T12:00:00),
+                BetweenDates(2024-01-02T12:00:00, 2024-01-03T12:00:00)
+             ),
+             Or(DayOfWeek(Tue), DayOfWeek(Thu))
+        )
       )
     """.stripMargin
 
     inside(StringLexer(expr)) {
-      case Right(token) => token mustBe AndToken(
-        OrToken(
-          BetweenDatesToken("2024-01-01T12:00:00","2024-01-02T12:00:00"),
-          BetweenDatesToken("2024-01-02T12:00:00","2024-01-03T12:00:00")
-        ),
-        OrToken(DayOfWeekToken("Tue"), DayOfWeekToken("Thu"))
+      case Right(token) => token mustBe NotToken(
+        AndToken(
+          OrToken(
+            BetweenDatesToken("2024-01-01T12:00:00","2024-01-02T12:00:00"),
+            BetweenDatesToken("2024-01-02T12:00:00","2024-01-03T12:00:00")
+          ),
+          OrToken(DayOfWeekToken("Tue"), DayOfWeekToken("Thu"))
+        )
       )
     }
   }

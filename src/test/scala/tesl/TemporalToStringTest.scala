@@ -1,5 +1,6 @@
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.must.Matchers
+import tesl.TE
 
 import java.time.DayOfWeek
 import java.time.LocalTime
